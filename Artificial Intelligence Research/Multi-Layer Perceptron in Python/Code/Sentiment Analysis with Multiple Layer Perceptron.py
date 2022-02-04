@@ -22,7 +22,7 @@ corpus = [
     'The town festival was postponed, so the area was a complete ghost town. We were the only guests. Not the experience I was looking for.',
     'We had a lovely time. It\'s a fantastic place to go with the children, they loved all the animals.',
     'A little bit off the beaten track, but completely worth it. You can hear thebirds sing in the morning and then you are greeted with the biggest sincerest smiles from the owners. Loved it!',
-    'It was good to be outside in the country, visiting old town. Everything was prepared to the upmost detail''
+    'It was good to be outside in the country, visiting old town. Everything was prepared to the upmost detail',
     'Staff was friend, Going to come back for sure',
 ]
 # 0: negative sentiment. 1: positive sentiment
