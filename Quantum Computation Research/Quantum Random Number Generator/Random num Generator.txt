@@ -1,0 +1,105 @@
+Classical computers are not very good at generating random numbers. When a computer generates what seems like a random number they are actually presenting a pseudorandom number which is based on the computer’s internal clock and parsed through a complex algorithm to generate a seemingly random integer. Quantum computers, on the other hand, can generate truly random numbers.
+The intent of this white paper is provide you with the understanding required to developing a quantum back end to generate a quantum random integer for use on an Android mobile device. This article uses the quantum random integer engine from The Quantum Dice app as a case study for future development of mobile applications using IBM’s Qiskit.
+Prerequisites:
+Knowledge of terminal.
+Basic understanding of Python syntax.
+Basic understanding of quantum computing
+General Overview
+Understanding Qubits
+Understanding Hadamard Gate
+Anaconda distro of Python is on your machine.
+Install Documentation
+NOTE: This article was tested using a Ubuntu machine but you can use whatever you are most comfortable with.
+CREATE YOUR DEVELOPMENT ENVIRONMENT
+It is best to develop using a virtual environment when programming with Qiskit [1]. Even when implementing Chaquo into your Gradle build, you can develop in a virtual environment because Gradle will recompile Qiskit into your build.
+First, create a virtual environment named ‘q’ (if you already have an environment named ‘q’ use a different name) with Conda [2].
+Install Qiskit and Activate The Environment [1].
+In terminal:
+// conda create -n q python=3 // conda activate q
+Now install Qiskit into your environment. You can view the package repository and versions here: www.pypi.org/project/qiskit/
+// pip install qiskit
+That’s it!
+The Qiskit SDK is now on your computer ready for you to use.
+
+DEVELOP THE QUANTUM RANDOM INTEGER ENGINE
+During the development cycle for The Quantum Dice app, the quantum engine was written first but was re-written to ensure proper interface with the user interface. The Quantum Engine in its current state is intended for backend use within a mobile application.
+To begin, writing the quantum engine open your favorite IDE.
+If you are using Android Studio, it is highly recommended you install the python plug-in.
+Select File > Settings.
+Select Plugins page
+Click “Install JetBrains plugin”
+Select “Python Community Edition”
+click “Install
+Restart Android Studio
+Create the directory “python” in your Android “Main” file.
+This directory is where Chaquo searches for the defined script in the Android main activity. You can add multiple python scripts if you choose, but The Quantum Dice only requires one script.
+Your new directory structure should look like this:
+app/src/main/python
+Now create a new empty python file.
+The Quantum Dice app named its python script “qengine.py” short for quantum engine.
+WRITE THE PYTHON CODE
+This portion of import code is a workaround for importing Qiskit into the Android framework using Chaquopy.
+from concurrent import futures futures.ProcessPoolExecutor = futures.ThreadPoolExecutor
+Import the required python packages to the python script. You must ensure all import packages are included on the App Level Gradel [3].
+import qiskit from qiskit import IBMQ import math
+This function will find the most available quantum server from IBM. Important to note, if none of the IBM servers are available, the function will use the Qiskit Aer simulator. Performance testing shows that by not searching for the most available server will result in a time-out on the mobile app.
+def set_backend(b = 'qasm_simulator'): global backendX if b == 'ibmqx4' or b == 'ibmqx5': backendX = IBMQ.get_backend(b) setqbits(5) elif b == 'ibmq_16_melbourne': backendX = IBMQ.get_backend(b) setqbits(16) elif b == 'ibmq_qasm_simulator': backendX = IBMQ.get_backend(b) setqbits(32) else: backendX = qiskit.BasicAer.get_backend('qasm_simulator') setqbits(8)
+This is the first function called by the Android main activity.
+The Android main activity submits the max number of sides to the quantum engine. For error proofing, the engine always assumes that the minimum amount of variables is one. Note: ‘randint’ is also the request for a pseudo-random integer through the math function. Be careful not to call ‘math.randint’.
+def randint(name):
+Chaquopy communicates using strings between the Android main activity file and the Python script; you have to change the input from a string to an integer to work within Python.
+xname = int(name) delta = xname-1
+According to our research, all modern cultures use a base-10 numerical system [4].
+Therefore, the app assumes the user inputs a base-10 number, but to reach the desired result the required binary bits must be defined.
+To create a bitstream, we must define the number of bits required to define the integer required. By using the logarithmic function bmin = ⌊log2(10d-1)⌋ + 1, you can easily calculate the required number of binary bits from the Qbits [11].
+n = math.floor(math.log(delta,2))+1 result = int(bitstring(n),2) while(result > delta): result = int(bitstring(n),2) return result+1
+The next function returns the bitstring using the requested number of bits ’n’ from the ‘randint’ function from earlier.
+The next function is also designed for error-proofing of the application to prevent crashing. If the cache count is less than the requested amount, the the application will request the proper amount of bits to resolve the calculations.
+def bitstring(n): global bitCacheX if len(bitCacheX) < n: bitrequest(n-len(bitCacheX)) bitString = bitCacheX[0:n] bitCacheX = bitCacheX[n:] return bitString
+To run properly, we must define static variable to call the quantum simulator. The reasoning for using the simulator instead of a qubit on the production app over pure qubit is to reduce the load on the infrastructure and allow for scalability of the mobile application to a mass market.
+NOTE: You, as a developer can apply for an IBM Q token and re-program your quantum script to use a pure qubit if required.
+backendX = qiskit.BasicAer.get_backend('qasm_simulator')
+C for Circuit creation
+c = None
+Create empty memory cache for incoming bit stream.
+bitCacheX = ''
+This next function outlines the static variables used through the engine; it outlines the most basic foundations for the quantum random number creation.
+In its most simple form, the engine requests use of three qubits, places those three atoms into a quantum state, then measure the qubits.
+A fundamental quantum mechanical concept is Schrödinger’s Equation [5].
+This Schrödinger’s Equation states that the probability of an atom having a up-spin or a down-spin or suspended in a superposition (both-spin) is infinite until the particle is measured.
+Schrödinger’s equation is the basic foundation of how The Quantum Dice calculates a random integer.
+Though recent research could potentially disprove Schrödinger’s Equation, the principals of finding a single random integer from an infinite amount of possibilities remains useable [6] [7] [8].
+def setqbits(n): global c qr = qiskit.QuantumRegister(n) cr = qiskit.ClassicalRegister(n) c = qiskit.QuantumCircuit(qr, cr)
+Next the Quantum Engine will apply a Hadamard gate to the qubits requested [9].
+c.h(qr)
+Collapse qubit to either 1 or 0 with equal probability.
+c.measure(qr,cr)
+Define the amount of Qbits used (Default Circuit is 3 Qbits.)
+setqbits(3)
+Once the foundation for the quantum circuit is created, this function will communicate and execute the instructions.
+The quantum dice app will only out one random number per request, the list displayed in the user interface is created using kotlin in the Android main activity. Using a loop on the main activity will execute the engine how many ever times the user defines as ‘number of dice’
+def bitrequest(n): global bitCacheX iterations = math.ceil(n/c.width()) for _ in range(iterations):
+Create new job and run the quantum circuit
+job = qiskit.execute(c, backendX, shots=1)
+Here you stash the output of the data into the devices cache.
+bitCacheX += bitcount(job.result().get_counts())
+Parse the output from IBM into a string of data.
+def bitcount(counts): return [k for k, v in counts.items() if v == 1][0]
+That’s all there is to the Quantum Random Integer Engine.
+A lot of the concepts used in this document were first outlined by Robbie McCorkell, his article was corner stone to developing the framework around the quantum integer engine [10].
+The Quantum Dice - Apps on Google Play
+Directly access a quantum computer with your phone. With Q-Dice literally all possibilities exist, and a single…
+play.google.com
+
+References
+IBM Qiskit Documentation, Install: https://qiskit.org/documentation/install.html
+Anaconda Documentation, Create: https://docs.conda.io/projects/conda/en/latest/commands/create.html
+Chaquo Documentation, Android: https://chaquo.com/chaquopy/doc/current/android.html
+Deb Russell, What is the Base 10 Number system?: https://www.thoughtco.com/definition-of-base-10-2312365
+Georgia State University, Shrodinger’s Equation: http://hyperphysics.phy-astr.gsu.edu/hbase/quantum/schr.html
+Davide Castelvecchi, Reimagining of Schrödinger’s Cat Breaks Quantum Mechanics — and Stumps Physicists: https://www.scientificamerican.com/article/reimagining-of-schroedingers-cat-breaks-quantum-mechanics-mdash-and-stumps-physicists1/
+Eric Cavalcanti, Schrodinger’s cat gets a reality check: https://phys.org/news/2015-02-schrodinger-cat-reality.html
+IBM Qiskit Documentation, Random Number Generation: https://github.com/Qiskit/qiskit-tutorials/blob/master/community/terra/qis_adv/random_number_generation.ipynb
+Jonathan Hui, QC — Programming with Quantum Gates (Single Qubits): https://medium.com/@jonathan_hui/qc-programming-with-quantum-gates-8996b667d256
+Robbie McCorkell, Generate True Random Numbers with a Quantum Computer: https://blog.red-badger.com/2018/9/24/generate-true-random-numbers-with-a-quantum-computer
+Rick Regan, Number of Bits in a Decimal Integer: https://www.exploringbinary.com/number-of-bits-in-a-decimal-integer/
