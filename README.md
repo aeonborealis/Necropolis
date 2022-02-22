@@ -7,3 +7,6 @@ Necropolis Research and Development ADR
   + 13 additional tutorials focusing on Generative NFTs and Generative Art, Coding smart contracts and minting NFTs added to cryptocurrency projects
   + Have added two different folders to the Programming Techniques folder, namely a tutorial on how to integrate VIM with Python, as well as a simple PGP encryption and decryption scheme for working with PGP keys
   + Uploaded Quantum Computation Section, have gone through and pre populated 5 tutorial directories within this folder
+  + Uploaded Programming Techniques for Generating images using Java Script
+  + Have Uploaded Programming Techniques going over how to organize files and directories using automated scripts in python
+  + 
