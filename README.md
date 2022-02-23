@@ -9,4 +9,4 @@ Necropolis Research and Development ADR
   + Uploaded Quantum Computation Section, have gone through and pre populated 5 tutorial directories within this folder
   + Uploaded Programming Techniques for Generating images using Java Script
   + Have Uploaded Programming Techniques going over how to organize files and directories using automated scripts in python
-  + 
+  + Have Uploaded Tutorials in PHP and serve side scripting
