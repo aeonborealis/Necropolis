@@ -10,3 +10,6 @@ Necropolis Research and Development ADR
   + Uploaded Programming Techniques for Generating images using Java Script
   + Have Uploaded Programming Techniques going over how to organize files and directories using automated scripts in python
   + Have Uploaded Tutorials in PHP and server side scripting
+
+3/22/23
++ Have gone ahead and written an implementation in Python for RAINBOW cryptographic Hash function utilizing mutlivariate cryptography. This is for use in quantum proof hashing functions. 
